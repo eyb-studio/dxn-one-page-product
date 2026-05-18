@@ -1,0 +1,62 @@
+{
+  "nav": {
+    "back": "Back",
+    "language": "Language"
+  },
+  "product": {
+    "label_new": "NEW",
+    "label_in_stock": "In stock",
+    "label_out_of_stock": "Out of stock",
+    "name": "Spirulina",
+    "subtitle": "100% pure spirulina — nature's complete superfood.",
+    "currency": "AED",
+    "description_tab": "Description",
+    "details_tab": "Details",
+    "qty": "Quantity",
+    "available": "{{count}} available",
+    "subtotal": "Subtotal",
+    "buy_now": "Buy Now",
+    "add_more": "Add more",
+    "secure_checkout": "Secure cash-on-delivery checkout",
+    "free_shipping": "Free shipping over 350 AED"
+  },
+  "location": {
+    "title": "Where should we deliver?",
+    "subtitle": "Pin your location on the map or fill in the address manually.",
+    "use_my_location": "Use my current location",
+    "search_placeholder": "Search for an address",
+    "address_line": "Address line",
+    "building": "Building / Apartment",
+    "city": "City",
+    "emirate": "Emirate",
+    "phone": "Phone number",
+    "fullname": "Full name",
+    "notes": "Delivery notes (optional)",
+    "continue": "Continue to review"
+  },
+  "review": {
+    "title": "Review your order",
+    "subtitle": "Confirm the items and delivery details below.",
+    "items": "Items",
+    "shipping": "Shipping",
+    "shipping_free": "FREE",
+    "total": "Total",
+    "deliver_to": "Deliver to",
+    "edit": "Edit",
+    "payment_method": "Payment method",
+    "cod": "Cash on Delivery",
+    "cod_subtitle": "Pay in cash when your order arrives.",
+    "place_order": "Place Order",
+    "terms": "By placing this order you agree to our terms of service."
+  },
+  "thank_you": {
+    "title": "Thank you for your order!",
+    "subtitle": "We've received your order and will be in touch shortly.",
+    "tracking": "Tracking number",
+    "next_steps_title": "What happens next?",
+    "step_1": "We'll send you an SMS or email confirming the order.",
+    "step_2": "Our team will contact you to confirm delivery time.",
+    "step_3": "Your order will be delivered to your address with cash on delivery.",
+    "back_home": "Back to product"
+  }
+}
