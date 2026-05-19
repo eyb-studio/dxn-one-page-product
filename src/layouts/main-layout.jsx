@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 
 import Iconify from '../components/iconify';
 import LanguagePopover from '../components/language-popover';
@@ -18,6 +19,8 @@ export default function MainLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLocales();
+  const theme = useTheme();
+  const isRtl = theme.direction === 'rtl';
   const showBack = location.pathname !== '/';
   const isTrackPage = location.pathname === '/track';
 
@@ -32,24 +35,27 @@ export default function MainLayout({ children }) {
       <AppBar
         position="sticky"
         elevation={0}
-        dir="ltr"
         sx={{
           backdropFilter: 'blur(8px)',
-          bgcolor: (theme) => `rgba(255,255,255,0.72)`,
-          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+          bgcolor: () => `rgba(255,255,255,0.72)`,
+          borderBottom: (th) => `1px solid ${th.palette.divider}`,
         }}
       >
         <Toolbar sx={{ px: { xs: 2, md: 3 } }}>
           <Stack direction="row" alignItems="center" sx={{ flexGrow: 1 }} spacing={1}>
             {showBack ? (
               <IconButton onClick={() => navigate(-1)} aria-label="back">
-                <Iconify icon="eva:arrow-ios-back-fill" width={22} />
+                <Iconify
+                  icon={isRtl ? 'eva:arrow-ios-forward-fill' : 'eva:arrow-ios-back-fill'}
+                  width={22}
+                />
               </IconButton>
             ) : null}
             <Typography
               component={Link}
               to="/"
               variant="h6"
+              dir="ltr"
               sx={{
                 textDecoration: 'none',
                 color: 'text.primary',
