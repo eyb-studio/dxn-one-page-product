@@ -9,7 +9,7 @@
     "label_in_stock": "In stock",
     "label_out_of_stock": "Out of stock",
     "name": "DXN Spirulina",
-    "subtitle": "500 mg · 500 tablets · ~3-month supply of nature's most complete superfood.",
+    "subtitle": "250 mg · 500 tablets · ~3-month supply of nature's most complete superfood.",
     "short_description": "100% pure DXN Spirulina — a complete plant-based protein packed with iron, B-vitamins, beta-carotene and antioxidants. 500 tablets in every bottle.",
     "currency": "AED",
     "description_tab": "Description",
@@ -81,7 +81,7 @@
       "cultivation_title": "Grown under tropical sun. Never touched by chemicals.",
       "cultivation_body": [
         "Most cheap spirulina on the market is grown in dusty open ponds with whatever water is nearby. We don't do that. DXN cultivates its spirulina in long, shallow, mineral-rich freshwater ponds under direct equatorial sunlight — the exact conditions this algae has thrived in for over 3.5 billion years.",
-        "Once it reaches peak nutrient density, it's harvested, gently washed and spray-dried at low temperature to lock in every vitamin, enzyme and antioxidant. Then it's pressed — under high pressure, with zero added binders or fillers — into a 500 mg tablet that holds its shape and dissolves cleanly in your stomach.",
+        "Once it reaches peak nutrient density, it's harvested, gently washed and spray-dried at low temperature to lock in every vitamin, enzyme and antioxidant. Then it's pressed — under high pressure, with zero added binders or fillers — into a 250 mg tablet that holds its shape and dissolves cleanly in your stomach.",
         "From pond to tablet, no chemicals, no irradiation, no animal products, and absolutely no shortcuts. The result is one of the cleanest spirulinas you can put on a UAE shelf."
       ],
       "purity_title": "Just spirulina. Nothing else.",
@@ -103,8 +103,8 @@
           "body": "For the first 3 days, take 3 tablets in the morning with a glass of water. This lets your body gently adjust to the rich nutrient load."
         },
         {
-          "title": "Build up to 6 daily",
-          "body": "From day 4 onward, take 6 tablets daily — 3 with breakfast and 3 with lunch, or all 6 at once before a workout. Avoid late evenings; the natural energy can keep you up."
+          "title": "Build up to 6–9 daily",
+          "body": "From day 4 onward, take 6 to 9 tablets daily — typically 3 with breakfast and 3 with lunch, or all of them at once before a workout. Go closer to 9 on heavy training days or when you need extra recovery. Avoid late evenings; the natural energy can keep you up."
         },
         {
           "title": "Stay consistent",
@@ -118,9 +118,9 @@
       "closing_body": "With 500 tablets per bottle, free delivery on 2 or more, and secure cash-on-delivery across the UAE, there is genuinely no reason to wait. Add it to your cart, take it daily for one month, and let your energy, skin and immunity speak for themselves."
     },
     "details": [
-      { "label": "Net contents", "value": "500 tablets (250 g)" },
-      { "label": "Tablet strength", "value": "500 mg per tablet" },
-      { "label": "Recommended serving", "value": "6 tablets daily" },
+      { "label": "Net contents", "value": "500 tablets (125 g)" },
+      { "label": "Tablet strength", "value": "250 mg per tablet" },
+      { "label": "Recommended serving", "value": "6 to 9 tablets daily" },
       { "label": "Servings per bottle", "value": "~83 days (almost 3 months)" },
       { "label": "Protein content", "value": "More than 60% complete plant protein" },
       { "label": "Key nutrients", "value": "Iron, B-vitamins (incl. B12), beta-carotene, GLA, chlorophyll, phycocyanin" },
