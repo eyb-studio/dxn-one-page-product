@@ -25,6 +25,16 @@ const UAE_LOCAL_MOBILE_RE = /^(50|52|54|55|56|58)\d{7}$/;
 
 const isUAELocalMobile = (value) => UAE_LOCAL_MOBILE_RE.test(value ?? '');
 
+// Strip invisible bidi / zero-width marks that mobile keyboards insert in
+// RTL contexts — they break yup's email regex even though the user sees a
+// clean string. Covers ZWSP/ZWNJ/ZWJ, LRM/RLM, LRE…RLO, LRI…PDI, BOM.
+const BIDI_RE = new RegExp(
+  '[\\u200B-\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]',
+  'g'
+);
+const stripBidi = (value) =>
+  typeof value === 'string' ? value.replace(BIDI_RE, '').trim() : value;
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -54,6 +64,7 @@ const createSchema = (t) =>
       .test('uae-phone', t('location.phone_invalid'), isUAELocalMobile),
     email: yup
       .string()
+      .transform(stripBidi)
       .required(t('location.email_required'))
       .email(t('location.email_invalid')),
     address: yup.string().required('Address is required'),
@@ -320,9 +331,14 @@ export default function LocationPage() {
                       error={!!error}
                       helperText={error ? error.message : t('location.phone_helper')}
                       InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start" sx={{ pointerEvents: 'none' }}>
-                            {UAE_DIAL_CODE}
+                        [isRtl ? 'endAdornment' : 'startAdornment']: (
+                          <InputAdornment
+                            position={isRtl ? 'end' : 'start'}
+                            sx={{ pointerEvents: 'none' }}
+                          >
+                            <Box component="span" dir="ltr">
+                              {UAE_DIAL_CODE}
+                            </Box>
                           </InputAdornment>
                         ),
                       }}
