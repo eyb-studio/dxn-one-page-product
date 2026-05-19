@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useSnackbar } from 'notistack';
@@ -6,6 +6,7 @@ import { useSnackbar } from 'notistack';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
+import CircularProgress from '@mui/material/CircularProgress';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
@@ -16,13 +17,13 @@ import { PRODUCT, SHIPPING } from '../data/product';
 import { fCurrency } from '../utils/format-currency';
 import { useOrder } from '../contexts/order-context';
 import { useLocales } from '../locales/use-locales';
-import { generateTrackingId } from '../utils/tracking';
 
 export default function ReviewPage() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { t } = useLocales();
-  const { quantity, address, setTrackingId } = useOrder();
+  const { t, lang } = useLocales();
+  const { quantity, address } = useOrder();
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!address) navigate('/location', { replace: true });
@@ -34,11 +35,47 @@ export default function ReviewPage() {
   const shipping = quantity >= SHIPPING.freeAfterQty ? 0 : SHIPPING.fee;
   const total = subtotal + shipping;
 
-  const onPlaceOrder = () => {
-    const id = generateTrackingId();
-    setTrackingId(id);
-    enqueueSnackbar(t('review.order_placed'), { variant: 'success' });
-    navigate('/thank-you');
+  const onPlaceOrder = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: address.fullname,
+          phone: address.phone,
+          email: address.email,
+          address: address.address,
+          building: address.building,
+          city: address.city,
+          emirate: address.emirate,
+          notes: address.notes,
+          coords: address.coords,
+          quantity,
+          language: lang,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const msg =
+          data.error === 'validation'
+            ? t('review.order_invalid')
+            : t('review.order_failed');
+        enqueueSnackbar(msg, { variant: 'error' });
+        return;
+      }
+
+      const { orderId } = await res.json();
+      enqueueSnackbar(t('review.order_placed'), { variant: 'success' });
+      navigate(`/thank-you?order=${encodeURIComponent(orderId)}`);
+    } catch (err) {
+      console.error('[review] place order failed:', err);
+      enqueueSnackbar(t('review.order_failed'), { variant: 'error' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -75,7 +112,14 @@ export default function ReviewPage() {
                   component="img"
                   src={PRODUCT.images[0]}
                   alt={t('product.name')}
-                  sx={{ width: 72, height: 72, borderRadius: 1.5, objectFit: 'cover' }}
+                  sx={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: 1.5,
+                    objectFit: 'contain',
+                    bgcolor: 'background.neutral',
+                    p: 0.5,
+                  }}
                 />
                 <Stack sx={{ flexGrow: 1 }}>
                   <Typography variant="subtitle2">{t('product.name')}</Typography>
@@ -199,10 +243,17 @@ export default function ReviewPage() {
               variant="contained"
               color="primary"
               onClick={onPlaceOrder}
+              disabled={submitting}
               sx={{ mt: 3, boxShadow: (th) => th.customShadows.primary }}
-              startIcon={<Iconify icon="solar:bag-check-bold" width={22} />}
+              startIcon={
+                submitting ? (
+                  <CircularProgress size={18} thickness={5} sx={{ color: 'inherit' }} />
+                ) : (
+                  <Iconify icon="solar:bag-check-bold" width={22} />
+                )
+              }
             >
-              {t('review.place_order')}
+              {submitting ? t('review.placing_order') : t('review.place_order')}
             </Button>
 
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 2, textAlign: 'center' }}>

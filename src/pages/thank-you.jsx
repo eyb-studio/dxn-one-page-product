@@ -1,53 +1,54 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import Divider from '@mui/material/Divider';
+import CircularProgress from '@mui/material/CircularProgress';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 
 import Iconify from '../components/iconify';
+import OrderStatus from '../components/order-status';
+import OrderSummaryCard from '../components/order-summary-card';
 import { useOrder } from '../contexts/order-context';
 import { useLocales } from '../locales/use-locales';
-import { PRODUCT, SHIPPING } from '../data/product';
 import { trackEvent } from '../utils/meta-pixel';
-
-const STEP_ICONS = ['solar:letter-bold', 'solar:phone-calling-bold', 'solar:delivery-bold'];
+import { useOrderLookup } from '../hooks/use-order-lookup';
 
 export default function ThankYouPage() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isRtl = theme.direction === 'rtl';
   const { t } = useLocales();
-  const { trackingId, quantity, reset } = useOrder();
+  const { reset } = useOrder();
+  const [params] = useSearchParams();
+  const orderId = params.get('order') || '';
+
+  const { order, error, loading } = useOrderLookup(orderId);
+  const [purchaseFired, setPurchaseFired] = useState(false);
 
   useEffect(() => {
-    if (!trackingId) navigate('/', { replace: true });
-  }, [trackingId, navigate]);
-
-  useEffect(() => {
-    if (!trackingId) return;
-    const subtotal = PRODUCT.price * quantity;
-    const shipping = quantity >= SHIPPING.freeAfterQty ? 0 : SHIPPING.fee;
+    if (!order || purchaseFired) return;
+    setPurchaseFired(true);
     trackEvent('Purchase', {
-      content_ids: [PRODUCT.id],
+      content_ids: ['dxn-spirulina-500'],
       content_name: 'DXN Spirulina',
       content_type: 'product',
-      num_items: quantity,
-      value: subtotal + shipping,
-      currency: PRODUCT.currency,
-      order_id: trackingId,
+      num_items: order.quantity,
+      value: order.total,
+      currency: order.currency,
+      order_id: order.orderId,
     });
-    // fire once per completed order
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trackingId]);
+  }, [order, purchaseFired]);
 
-  if (!trackingId) return null;
+  if (!orderId) {
+    navigate('/', { replace: true });
+    return null;
+  }
 
   const handleBack = () => {
     reset();
@@ -60,92 +61,89 @@ export default function ThankYouPage() {
         <title>Thank you · DXN Spirulina</title>
       </Helmet>
 
-      <Box sx={{ maxWidth: 640, mx: 'auto', textAlign: 'center', pt: { xs: 2, md: 6 } }}>
-        <motion.div
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', damping: 14, stiffness: 220 }}
-        >
-          <Box
-            sx={{
-              width: 96,
-              height: 96,
-              mx: 'auto',
-              borderRadius: '50%',
-              bgcolor: 'primary.lighter',
-              color: 'primary.darker',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mb: 3,
-            }}
-          >
-            <Iconify icon="solar:check-circle-bold" width={56} />
-          </Box>
-        </motion.div>
-
-        <Typography variant="h2" sx={{ mb: 1 }}>
-          {t('thank_you.title')}
-        </Typography>
-        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4 }}>
-          {t('thank_you.subtitle')}
-        </Typography>
-
-        <Card sx={{ p: { xs: 2.5, md: 3 }, mb: 3, textAlign: 'start' }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Stack>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                {t('thank_you.tracking')}
-              </Typography>
-              <Typography variant="h5" sx={{ letterSpacing: 1, fontFamily: 'monospace' }}>
-                {trackingId}
-              </Typography>
-            </Stack>
-            <Iconify icon="solar:bag-check-bold" width={32} sx={{ color: 'primary.main' }} />
+      <Box sx={{ maxWidth: 720, mx: 'auto', pt: { xs: 1, md: 4 } }}>
+        {loading ? (
+          <Stack alignItems="center" spacing={2} sx={{ py: 8 }}>
+            <CircularProgress />
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              {t('thank_you.loading')}
+            </Typography>
           </Stack>
-        </Card>
-
-        <Card sx={{ p: { xs: 2.5, md: 3 }, mb: 4, textAlign: 'start' }}>
-          <Typography variant="subtitle1" sx={{ mb: 2 }}>
-            {t('thank_you.next_steps_title')}
-          </Typography>
-          <Stack spacing={2}>
-            {[1, 2, 3].map((n, i) => (
-              <Stack key={n} direction="row" spacing={2} alignItems="flex-start">
+        ) : error ? (
+          <Card sx={{ p: { xs: 3, md: 4 }, textAlign: 'center' }}>
+            <Iconify icon="solar:danger-triangle-bold" width={48} sx={{ color: 'error.main', mb: 2 }} />
+            <Typography variant="h5" sx={{ mb: 1 }}>
+              {t('thank_you.not_found_title')}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+              {t('thank_you.not_found_body')}
+            </Typography>
+            <Stack direction="row" spacing={1.5} justifyContent="center">
+              <Button component={Link} to="/track" variant="outlined">
+                {t('track.title')}
+              </Button>
+              <Button component={Link} to="/" variant="contained" color="primary">
+                {t('thank_you.back_home')}
+              </Button>
+            </Stack>
+          </Card>
+        ) : order ? (
+          <Stack spacing={3}>
+            <Stack alignItems="center" spacing={2} sx={{ textAlign: 'center' }}>
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', damping: 14, stiffness: 220 }}
+              >
                 <Box
                   sx={{
-                    width: 36,
-                    height: 36,
+                    width: 88,
+                    height: 88,
                     borderRadius: '50%',
-                    bgcolor: 'background.neutral',
-                    color: 'text.primary',
+                    bgcolor: 'primary.lighter',
+                    color: 'primary.darker',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    flexShrink: 0,
                   }}
                 >
-                  <Iconify icon={STEP_ICONS[i]} width={20} />
+                  <Iconify icon="solar:check-circle-bold" width={52} />
                 </Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', pt: 0.75 }}>
-                  {t(`thank_you.step_${n}`)}
-                </Typography>
-              </Stack>
-            ))}
+              </motion.div>
+
+              <Typography variant="h2">{t('thank_you.title')}</Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: 520 }}>
+                {t('thank_you.subtitle')}
+              </Typography>
+            </Stack>
+
+            <OrderSummaryCard order={order} />
+
+            <Card sx={{ p: { xs: 2.5, md: 3 } }}>
+              <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                {t('thank_you.status_title')}
+              </Typography>
+              <OrderStatus status={order.status} />
+            </Card>
+
+            <Stack direction="row" spacing={1.5} justifyContent="center">
+              <Button
+                variant="outlined"
+                color="inherit"
+                size="large"
+                onClick={handleBack}
+                startIcon={
+                  <Iconify
+                    icon={isRtl ? 'eva:arrow-ios-forward-fill' : 'eva:arrow-ios-back-fill'}
+                    width={20}
+                  />
+                }
+              >
+                {t('thank_you.back_home')}
+              </Button>
+            </Stack>
           </Stack>
-        </Card>
-
-        <Divider sx={{ borderStyle: 'dashed', mb: 3 }} />
-
-        <Button
-          variant="outlined"
-          color="inherit"
-          size="large"
-          startIcon={<Iconify icon={isRtl ? 'eva:arrow-ios-forward-fill' : 'eva:arrow-ios-back-fill'} width={20} />}
-          onClick={handleBack}
-        >
-          {t('thank_you.back_home')}
-        </Button>
+        ) : null}
       </Box>
     </>
   );

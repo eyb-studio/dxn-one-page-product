@@ -5,7 +5,6 @@ const OrderContext = createContext(null);
 export function OrderProvider({ children }) {
   const [quantity, setQuantity] = useState(1);
   const [address, setAddress] = useState(null);
-  const [trackingId, setTrackingId] = useState(null);
 
   const value = useMemo(
     () => ({
@@ -13,15 +12,12 @@ export function OrderProvider({ children }) {
       setQuantity,
       address,
       setAddress,
-      trackingId,
-      setTrackingId,
       reset: () => {
         setQuantity(1);
         setAddress(null);
-        setTrackingId(null);
       },
     }),
-    [quantity, address, trackingId]
+    [quantity, address]
   );
 
   return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;

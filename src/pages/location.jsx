@@ -1,29 +1,29 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useSnackbar } from 'notistack';
 import { GoogleMap, MarkerF, useJsApiLoader } from '@react-google-maps/api';
+
+const UAE_DIAL_CODE = '+971';
 
 const toWesternDigits = (s = '') =>
   s
     .replace(/[٠-٩]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0x0660 + 0x30))
     .replace(/[۰-۹]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0x06f0 + 0x30));
 
-const normalizeUAEPhone = (value = '') => {
-  const digits = toWesternDigits(value).replace(/\D/g, '');
-  if (digits.startsWith('00971')) return '0' + digits.slice(5);
-  if (digits.startsWith('971')) return '0' + digits.slice(3);
-  return digits;
+const toLocalUAEPhone = (value = '') => {
+  let digits = toWesternDigits(value).replace(/\D/g, '');
+  if (digits.startsWith('00971')) digits = digits.slice(5);
+  else if (digits.startsWith('971')) digits = digits.slice(3);
+  if (digits.startsWith('0')) digits = digits.slice(1);
+  return digits.slice(0, 9);
 };
 
-const UAE_MOBILE_RE = /^0(50|52|54|55|56|58)\d{7}$/;
+const UAE_LOCAL_MOBILE_RE = /^(50|52|54|55|56|58)\d{7}$/;
 
-const isUAEMobile = (value) => {
-  if (!value) return false;
-  return UAE_MOBILE_RE.test(normalizeUAEPhone(value));
-};
+const isUAELocalMobile = (value) => UAE_LOCAL_MOBILE_RE.test(value ?? '');
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -31,7 +31,9 @@ import Card from '@mui/material/Card';
 import CircularProgress from '@mui/material/CircularProgress';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
+import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import { Helmet } from 'react-helmet-async';
@@ -49,7 +51,11 @@ const createSchema = (t) =>
     phone: yup
       .string()
       .required(t('location.phone_required'))
-      .test('uae-phone', t('location.phone_invalid'), isUAEMobile),
+      .test('uae-phone', t('location.phone_invalid'), isUAELocalMobile),
+    email: yup
+      .string()
+      .required(t('location.email_required'))
+      .email(t('location.email_invalid')),
     address: yup.string().required('Address is required'),
     building: yup.string().required('Building / Apartment is required'),
     city: yup.string().required('City is required'),
@@ -88,7 +94,8 @@ export default function LocationPage() {
     resolver: yupResolver(schema),
     defaultValues: {
       fullname: address?.fullname ?? '',
-      phone: address?.phone ?? '',
+      phone: toLocalUAEPhone(address?.phone ?? ''),
+      email: address?.email ?? '',
       address: address?.address ?? '',
       building: address?.building ?? '',
       city: address?.city ?? 'Dubai',
@@ -97,7 +104,7 @@ export default function LocationPage() {
     },
   });
 
-  const { handleSubmit, setValue } = methods;
+  const { control, handleSubmit, setValue } = methods;
 
   const reverseGeocode = useCallback(
     async (point) => {
@@ -189,7 +196,7 @@ export default function LocationPage() {
   }, [enqueueSnackbar, pickLocation]);
 
   const onSubmit = handleSubmit((data) => {
-    setAddress({ ...data, phone: normalizeUAEPhone(data.phone), coords });
+    setAddress({ ...data, phone: `${UAE_DIAL_CODE}${data.phone}`, coords });
     navigate('/review');
   });
 
@@ -299,13 +306,42 @@ export default function LocationPage() {
             <Card sx={{ p: { xs: 2.5, md: 3 } }}>
               <Stack spacing={2.5}>
                 <RHFTextField name="fullname" label={t('location.fullname')} />
-                <RHFTextField
+                <Controller
                   name="phone"
-                  label={t('location.phone')}
-                  type="tel"
-                  placeholder="050 123 4567"
-                  helperText={t('location.phone_helper')}
-                  inputProps={{ inputMode: 'tel', autoComplete: 'tel', dir: 'ltr' }}
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      type="tel"
+                      label={t('location.phone')}
+                      placeholder="50 123 4567"
+                      onChange={(e) => field.onChange(toLocalUAEPhone(e.target.value))}
+                      error={!!error}
+                      helperText={error ? error.message : t('location.phone_helper')}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start" sx={{ pointerEvents: 'none' }}>
+                            {UAE_DIAL_CODE}
+                          </InputAdornment>
+                        ),
+                      }}
+                      inputProps={{
+                        inputMode: 'tel',
+                        autoComplete: 'tel-national',
+                        dir: 'ltr',
+                        maxLength: 9,
+                      }}
+                    />
+                  )}
+                />
+                <RHFTextField
+                  name="email"
+                  label={t('location.email')}
+                  type="email"
+                  placeholder="you@example.com"
+                  helperText={t('location.email_helper')}
+                  inputProps={{ inputMode: 'email', autoComplete: 'email', dir: 'ltr' }}
                 />
                 <RHFTextField name="address" label={t('location.address_line')} />
                 <RHFTextField name="building" label={t('location.building')} />

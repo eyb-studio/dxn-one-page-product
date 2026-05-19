@@ -1,7 +1,8 @@
 {
   "nav": {
     "back": "Back",
-    "language": "Language"
+    "language": "Language",
+    "track_order": "Track order"
   },
   "product": {
     "label_new": "NEW",
@@ -150,10 +151,14 @@
     "city": "City",
     "emirate": "Emirate",
     "phone": "Phone number",
-    "phone_helper": "UAE mobile only — e.g. 050 123 4567 or +971 50 123 4567",
+    "phone_helper": "UAE mobile only — enter 9 digits, e.g. 50 123 4567",
     "phone_required": "Phone number is required",
-    "phone_invalid": "Enter a valid UAE mobile number (050, 052, 054, 055, 056 or 058)",
+    "phone_invalid": "Enter a valid UAE mobile number starting with 50, 52, 54, 55, 56 or 58",
     "fullname": "Full name",
+    "email": "Email address",
+    "email_helper": "We'll send your order confirmation here.",
+    "email_required": "Email is required",
+    "email_invalid": "Enter a valid email address",
     "notes": "Delivery notes (optional)",
     "continue": "Continue to review"
   },
@@ -170,17 +175,44 @@
     "cod": "Cash on Delivery",
     "cod_subtitle": "Pay in cash when your order arrives.",
     "place_order": "Place Order",
+    "placing_order": "Placing order…",
     "order_placed": "Order placed successfully",
+    "order_failed": "Could not place your order. Please try again.",
+    "order_invalid": "Some details look invalid. Please review and try again.",
     "terms": "By placing this order you agree to our terms of service."
   },
   "thank_you": {
     "title": "Thank you for your order!",
-    "subtitle": "We've received your order and will be in touch shortly.",
-    "tracking": "Tracking number",
-    "next_steps_title": "What happens next?",
-    "step_1": "We'll send you an SMS or email confirming the order.",
-    "step_2": "Our team will contact you to confirm delivery time.",
-    "step_3": "Your order will be delivered to your address with cash on delivery.",
+    "subtitle": "We've received your order and will WhatsApp or call you shortly to confirm delivery.",
+    "tracking": "Order number",
+    "status_title": "Order status",
+    "loading": "Loading your order…",
+    "not_found_title": "We couldn't find that order",
+    "not_found_body": "The link may be expired or mistyped. Try the order tracker, or head back to the product page.",
     "back_home": "Back to product"
+  },
+  "track": {
+    "title": "Track your order",
+    "subtitle": "Enter the order number from your confirmation email to see the latest status.",
+    "order_id_label": "Order number",
+    "order_id_helper": "Format: DXN-XXXXXX",
+    "lookup": "Track",
+    "invalid_format": "Use the format DXN-XXXXXX from your confirmation.",
+    "not_found_title": "Order not found",
+    "not_found_body": "Double-check the order number from your confirmation email.",
+    "error_title": "Something went wrong",
+    "error_body": "We couldn't reach our servers. Please try again in a moment."
+  },
+  "order_status": {
+    "now": "NOW",
+    "pending": "Order received",
+    "pending_desc": "We have your order and will reach out shortly to confirm.",
+    "confirmed": "Confirmed",
+    "confirmed_desc": "Our team has confirmed your delivery details by phone or WhatsApp.",
+    "dispatched": "Out for delivery",
+    "dispatched_desc": "Your order has been dispatched to the courier.",
+    "delivered": "Delivered",
+    "delivered_desc": "Order delivered. Enjoy your DXN Spirulina!",
+    "cancelled": "Order cancelled"
   }
 }
