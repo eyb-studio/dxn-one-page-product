@@ -11,6 +11,8 @@ import Iconify from '../../components/iconify';
 import { fCurrency } from '../../utils/format-currency';
 import { useOrder } from '../../contexts/order-context';
 import { useLocales } from '../../locales/use-locales';
+import { SHIPPING } from '../../data/product';
+import { trackEvent } from '../../utils/meta-pixel';
 
 export default function ProductSummary({ product }) {
   const navigate = useNavigate();
@@ -22,7 +24,17 @@ export default function ProductSummary({ product }) {
   const inc = () => setQuantity(Math.min(product.available, quantity + 1));
   const dec = () => setQuantity(Math.max(1, quantity - 1));
 
-  const handleBuy = () => navigate('/location');
+  const handleBuy = () => {
+    trackEvent('InitiateCheckout', {
+      content_ids: [product.id],
+      content_name: 'DXN Spirulina',
+      content_type: 'product',
+      num_items: quantity,
+      value: total,
+      currency: product.currency,
+    });
+    navigate('/location');
+  };
 
   return (
     <Stack spacing={3} sx={{ pt: { xs: 0, md: 1 } }}>
@@ -118,8 +130,17 @@ export default function ProductSummary({ product }) {
         </Stack>
         <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'divider' }} />
         <Stack direction="row" spacing={0.75} alignItems="center">
-          <Iconify icon="solar:delivery-bold" width={18} />
-          <Typography variant="caption">{t('product.free_shipping')}</Typography>
+          <Iconify
+            icon="solar:delivery-bold"
+            width={18}
+            sx={{ color: quantity >= SHIPPING.freeAfterQty ? 'success.main' : 'inherit' }}
+          />
+          <Typography
+            variant="caption"
+            sx={{ color: quantity >= SHIPPING.freeAfterQty ? 'success.darker' : 'inherit', fontWeight: quantity >= SHIPPING.freeAfterQty ? 700 : 400 }}
+          >
+            {quantity >= SHIPPING.freeAfterQty ? t('product.free_shipping') : t('product.add_for_free_delivery')}
+          </Typography>
         </Stack>
       </Stack>
     </Stack>

@@ -12,7 +12,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import Iconify from '../components/iconify';
-import { PRODUCT } from '../data/product';
+import { PRODUCT, SHIPPING } from '../data/product';
 import { fCurrency } from '../utils/format-currency';
 import { useOrder } from '../contexts/order-context';
 import { useLocales } from '../locales/use-locales';
@@ -31,12 +31,13 @@ export default function ReviewPage() {
   if (!address) return null;
 
   const subtotal = PRODUCT.price * quantity;
-  const total = subtotal;
+  const shipping = quantity >= SHIPPING.freeAfterQty ? 0 : SHIPPING.fee;
+  const total = subtotal + shipping;
 
   const onPlaceOrder = () => {
     const id = generateTrackingId();
     setTrackingId(id);
-    enqueueSnackbar('Order placed successfully', { variant: 'success' });
+    enqueueSnackbar(t('review.order_placed'), { variant: 'success' });
     navigate('/thank-you');
   };
 
@@ -73,13 +74,13 @@ export default function ReviewPage() {
                 <Box
                   component="img"
                   src={PRODUCT.images[0]}
-                  alt={PRODUCT.name}
+                  alt={t('product.name')}
                   sx={{ width: 72, height: 72, borderRadius: 1.5, objectFit: 'cover' }}
                 />
                 <Stack sx={{ flexGrow: 1 }}>
                   <Typography variant="subtitle2">{t('product.name')}</Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    {PRODUCT.subtitle}
+                    {t('product.subtitle')}
                   </Typography>
                 </Stack>
                 <Stack alignItems="flex-end">
@@ -167,10 +168,20 @@ export default function ReviewPage() {
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   {t('review.shipping')}
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'success.darker', fontWeight: 700 }}>
-                  {t('review.shipping_free')}
-                </Typography>
+                {shipping === 0 ? (
+                  <Typography variant="body2" sx={{ color: 'success.darker', fontWeight: 700 }}>
+                    {t('review.shipping_free')}
+                  </Typography>
+                ) : (
+                  <Typography variant="body2">{fCurrency(shipping, PRODUCT.currency)}</Typography>
+                )}
               </Stack>
+              {shipping > 0 ? (
+                <Stack direction="row" spacing={0.75} alignItems="center" sx={{ color: 'text.secondary' }}>
+                  <Iconify icon="solar:info-circle-bold" width={14} />
+                  <Typography variant="caption">{t('product.add_for_free_delivery')}</Typography>
+                </Stack>
+              ) : null}
             </Stack>
 
             <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />

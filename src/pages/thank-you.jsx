@@ -9,21 +9,43 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 
 import Iconify from '../components/iconify';
 import { useOrder } from '../contexts/order-context';
 import { useLocales } from '../locales/use-locales';
+import { PRODUCT, SHIPPING } from '../data/product';
+import { trackEvent } from '../utils/meta-pixel';
 
 const STEP_ICONS = ['solar:letter-bold', 'solar:phone-calling-bold', 'solar:delivery-bold'];
 
 export default function ThankYouPage() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isRtl = theme.direction === 'rtl';
   const { t } = useLocales();
-  const { trackingId, reset } = useOrder();
+  const { trackingId, quantity, reset } = useOrder();
 
   useEffect(() => {
     if (!trackingId) navigate('/', { replace: true });
   }, [trackingId, navigate]);
+
+  useEffect(() => {
+    if (!trackingId) return;
+    const subtotal = PRODUCT.price * quantity;
+    const shipping = quantity >= SHIPPING.freeAfterQty ? 0 : SHIPPING.fee;
+    trackEvent('Purchase', {
+      content_ids: [PRODUCT.id],
+      content_name: 'DXN Spirulina',
+      content_type: 'product',
+      num_items: quantity,
+      value: subtotal + shipping,
+      currency: PRODUCT.currency,
+      order_id: trackingId,
+    });
+    // fire once per completed order
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trackingId]);
 
   if (!trackingId) return null;
 
@@ -119,7 +141,7 @@ export default function ThankYouPage() {
           variant="outlined"
           color="inherit"
           size="large"
-          startIcon={<Iconify icon="eva:arrow-ios-back-fill" width={20} />}
+          startIcon={<Iconify icon={isRtl ? 'eva:arrow-ios-forward-fill' : 'eva:arrow-ios-back-fill'} width={20} />}
           onClick={handleBack}
         >
           {t('thank_you.back_home')}

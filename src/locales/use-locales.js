@@ -3,14 +3,10 @@ import { allLangs } from './i18n';
 
 export function useLocales() {
   const { i18n, t } = useTranslation();
-  const currentLang = allLangs.find((lang) => lang.value === i18n.language) || allLangs[0];
+  const active = i18n.resolvedLanguage || i18n.language;
+  const currentLang = allLangs.find((lang) => lang.value === active) || allLangs[0];
 
-  const onChangeLang = async (value) => {
-    await i18n.changeLanguage(value);
-    localStorage.setItem('i18nextLng', value);
-    document.documentElement.lang = value;
-    document.documentElement.dir = value === 'ar' ? 'rtl' : 'ltr';
-  };
+  const onChangeLang = (value) => i18n.changeLanguage(value);
 
-  return { t, currentLang, allLangs, onChangeLang, lang: i18n.language };
+  return { t, currentLang, allLangs, onChangeLang, lang: active };
 }

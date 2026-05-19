@@ -7,29 +7,152 @@
     "label_new": "NEW",
     "label_in_stock": "In stock",
     "label_out_of_stock": "Out of stock",
-    "name": "Spirulina",
-    "subtitle": "100% pure spirulina — nature's complete superfood.",
+    "name": "DXN Spirulina",
+    "subtitle": "500 mg · 500 tablets · ~3-month supply of nature's most complete superfood.",
+    "short_description": "100% pure DXN Spirulina — a complete plant-based protein packed with iron, B-vitamins, beta-carotene and antioxidants. 500 tablets in every bottle.",
     "currency": "AED",
     "description_tab": "Description",
     "details_tab": "Details",
+    "blog": {
+      "hero_eyebrow": "THE STORY OF DXN SPIRULINA",
+      "hero_title": "Nature's most complete superfood — pressed into a tiny green tablet.",
+      "hero_body": "Long before vitamins came in plastic bottles, the Aztecs were harvesting a deep-green algae from the lakes around Mexico and pressing it into cakes that fueled warriors for days. Astronauts later took it to space. Today, the World Health Organization has called it 'the best food for tomorrow.' DXN bottles 500 of those tiny green tablets so you can put it to work in your own life — starting tomorrow morning.",
+      "stats": [
+        { "value": "500", "label": "Tablets per bottle" },
+        { "value": "60%+", "label": "Complete plant protein" },
+        { "value": "~3 mo", "label": "Daily supply" },
+        { "value": "0", "label": "Fillers or binders" }
+      ],
+      "benefits_title": "Why this isn't just another supplement",
+      "benefits_intro": "Spirulina is one of the only foods on earth that delivers complete protein, essential vitamins, rare minerals and powerful antioxidants in the same bite. Most multivitamins are synthetic chemistry. This is whole, living food.",
+      "benefits": [
+        {
+          "icon": "solar:dna-bold",
+          "title": "60%+ Complete Plant Protein",
+          "body": "Gram-for-gram more protein than beef, and it carries all 9 essential amino acids your body cannot make on its own. Ideal for vegetarians, athletes and anyone trying to eat less meat without losing strength."
+        },
+        {
+          "icon": "solar:bolt-circle-bold",
+          "title": "Natural, Sustained Energy",
+          "body": "Iron, B-vitamins (including B12) and GLA fatty acids fuel your cells from the inside, instead of spiking and crashing your blood sugar like caffeine and sugary energy drinks do."
+        },
+        {
+          "icon": "solar:shield-keyhole-bold",
+          "title": "Phycocyanin Antioxidants",
+          "body": "The blue pigment unique to spirulina is one of the most potent antioxidants ever measured — it neutralizes the free radicals behind premature aging, low immunity and chronic fatigue."
+        },
+        {
+          "icon": "solar:heart-pulse-bold",
+          "title": "Heart, Skin & Detox Support",
+          "body": "Studies show daily spirulina helps balance cholesterol, supports liver detox, calms inflammation and brightens skin from the inside — a beauty supplement disguised as a green tablet."
+        }
+      ],
+      "feelings_title": "What you'll start to feel within weeks",
+      "feelings_intro": "Customers tell us the same thing again and again: the changes are subtle for the first 7–10 days, then they hit all at once. Here's what to look out for.",
+      "feelings": [
+        {
+          "icon": "solar:bolt-circle-bold",
+          "title": "Steady, all-day energy — no 3 PM crash",
+          "body": "Spirulina feeds your mitochondria, the tiny power plants in every cell. Most people notice they stop reaching for that second or third coffee within two weeks."
+        },
+        {
+          "icon": "solar:shield-check-bold",
+          "title": "Fewer colds, faster recovery",
+          "body": "Phycocyanin and beta-carotene support your immune cells. You'll bounce back from late nights, long flights and seasonal bugs much faster."
+        },
+        {
+          "icon": "solar:dumbbell-large-bold",
+          "title": "Better workouts, less soreness",
+          "body": "Complete amino acids and iron help your muscles rebuild after training, while antioxidants reduce next-day soreness. A favorite of UAE-based runners and CrossFitters."
+        },
+        {
+          "icon": "solar:sun-bold",
+          "title": "Clearer skin, healthier hair",
+          "body": "Chlorophyll detoxifies, B-vitamins support hair and nails, and antioxidants give your skin a natural glow. Many women notice the difference before their partner does."
+        },
+        {
+          "icon": "solar:lightbulb-bold",
+          "title": "Sharper focus, calmer mind",
+          "body": "Stable B12 and GLA levels are linked to better mood and concentration. Spirulina is one of the very few plant foods that delivers both."
+        }
+      ],
+      "cultivation_eyebrow": "FROM POND TO TABLET",
+      "cultivation_title": "Grown under tropical sun. Never touched by chemicals.",
+      "cultivation_body": [
+        "Most cheap spirulina on the market is grown in dusty open ponds with whatever water is nearby. We don't do that. DXN cultivates its spirulina in long, shallow, mineral-rich freshwater ponds under direct equatorial sunlight — the exact conditions this algae has thrived in for over 3.5 billion years.",
+        "Once it reaches peak nutrient density, it's harvested, gently washed and spray-dried at low temperature to lock in every vitamin, enzyme and antioxidant. Then it's pressed — under high pressure, with zero added binders or fillers — into a 500 mg tablet that holds its shape and dissolves cleanly in your stomach.",
+        "From pond to tablet, no chemicals, no irradiation, no animal products, and absolutely no shortcuts. The result is one of the cleanest spirulinas you can put on a UAE shelf."
+      ],
+      "purity_title": "Just spirulina. Nothing else.",
+      "purity_intro": "Read the back of most supplement bottles and you'll see a list of ingredients you can't pronounce. Read ours, and you'll see one word.",
+      "purity": [
+        "No artificial colours or dyes",
+        "No preservatives",
+        "No binders or fillers",
+        "No GMO ingredients",
+        "No gluten or dairy",
+        "No animal derivatives"
+      ],
+      "certifications": ["Halal", "Vegan", "Non-GMO", "Gluten-Free", "GMP Certified"],
+      "usage_title": "How to take DXN Spirulina",
+      "usage_intro": "Spirulina is a food, not a drug — there's no rigid timing. But here's how most of our customers get the best results.",
+      "usage_steps": [
+        {
+          "title": "Start with 3 tablets",
+          "body": "For the first 3 days, take 3 tablets in the morning with a glass of water. This lets your body gently adjust to the rich nutrient load."
+        },
+        {
+          "title": "Build up to 6 daily",
+          "body": "From day 4 onward, take 6 tablets daily — 3 with breakfast and 3 with lunch, or all 6 at once before a workout. Avoid late evenings; the natural energy can keep you up."
+        },
+        {
+          "title": "Stay consistent",
+          "body": "Real results show after 21–30 days of daily use. One bottle of 500 tablets gives you almost 3 full months — more than enough to feel the full transformation."
+        }
+      ],
+      "testimonial_quote": "I've tried every vitamin under the sun. Two weeks of DXN Spirulina and I stopped needing my second coffee, my skin cleared up, and I'm sleeping better than I have in years. The 500-tablet bottle is honestly the deal of the century.",
+      "testimonial_author": "Sara A.",
+      "testimonial_meta": "Verified buyer · Dubai · 38 years old",
+      "closing_title": "Give your body 30 days. It'll do the rest.",
+      "closing_body": "With 500 tablets per bottle, free delivery on 2 or more, and secure cash-on-delivery across the UAE, there is genuinely no reason to wait. Add it to your cart, take it daily for one month, and let your energy, skin and immunity speak for themselves."
+    },
+    "details": [
+      { "label": "Net contents", "value": "500 tablets (250 g)" },
+      { "label": "Tablet strength", "value": "500 mg per tablet" },
+      { "label": "Recommended serving", "value": "6 tablets daily" },
+      { "label": "Servings per bottle", "value": "~83 days (almost 3 months)" },
+      { "label": "Protein content", "value": "More than 60% complete plant protein" },
+      { "label": "Key nutrients", "value": "Iron, B-vitamins (incl. B12), beta-carotene, GLA, chlorophyll, phycocyanin" },
+      { "label": "Source", "value": "Premium-grade Spirulina platensis, sun-cultivated in mineral-rich freshwater" },
+      { "label": "Certifications", "value": "Halal · Vegan · Non-GMO · Gluten-free · GMP-manufactured" },
+      { "label": "Suitable for", "value": "Adults and children above 6 years" },
+      { "label": "Storage", "value": "Store in a cool, dry place away from direct sunlight" },
+      { "label": "Shelf life", "value": "36 months from manufacturing date" }
+    ],
     "qty": "Quantity",
     "available": "{{count}} available",
     "subtotal": "Subtotal",
     "buy_now": "Buy Now",
     "add_more": "Add more",
     "secure_checkout": "Secure cash-on-delivery checkout",
-    "free_shipping": "Free shipping over 350 AED"
+    "free_shipping": "Free delivery when you buy 2+",
+    "add_for_free_delivery": "Add 1 more for free delivery",
+    "cta_order_now": "Order My Bottle Now",
+    "cta_cod_badge": "Pay on delivery"
   },
   "location": {
     "title": "Where should we deliver?",
     "subtitle": "Pin your location on the map or fill in the address manually.",
-    "use_my_location": "Use my current location",
+    "use_my_location": "Locate me",
     "search_placeholder": "Search for an address",
     "address_line": "Address line",
     "building": "Building / Apartment",
     "city": "City",
     "emirate": "Emirate",
     "phone": "Phone number",
+    "phone_helper": "UAE mobile only — e.g. 050 123 4567 or +971 50 123 4567",
+    "phone_required": "Phone number is required",
+    "phone_invalid": "Enter a valid UAE mobile number (050, 052, 054, 055, 056 or 058)",
     "fullname": "Full name",
     "notes": "Delivery notes (optional)",
     "continue": "Continue to review"
@@ -47,6 +170,7 @@
     "cod": "Cash on Delivery",
     "cod_subtitle": "Pay in cash when your order arrives.",
     "place_order": "Place Order",
+    "order_placed": "Order placed successfully",
     "terms": "By placing this order you agree to our terms of service."
   },
   "thank_you": {

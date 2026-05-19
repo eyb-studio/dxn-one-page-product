@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -9,17 +10,25 @@ import Typography from '@mui/material/Typography';
 
 import Iconify from '../components/iconify';
 import LanguagePopover from '../components/language-popover';
+import { trackPageView } from '../utils/meta-pixel';
 
 export default function MainLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const showBack = location.pathname !== '/';
 
+  const firstPathRef = useRef(location.pathname);
+  useEffect(() => {
+    if (location.pathname === firstPathRef.current) return; // initial PageView already fired by base pixel
+    trackPageView();
+  }, [location.pathname]);
+
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
       <AppBar
         position="sticky"
         elevation={0}
+        dir="ltr"
         sx={{
           backdropFilter: 'blur(8px)',
           bgcolor: (theme) => `rgba(255,255,255,0.72)`,
@@ -29,7 +38,7 @@ export default function MainLayout({ children }) {
         <Toolbar sx={{ px: { xs: 2, md: 3 } }}>
           <Stack direction="row" alignItems="center" sx={{ flexGrow: 1 }} spacing={1}>
             {showBack ? (
-              <IconButton onClick={() => navigate(-1)} edge="start" aria-label="back">
+              <IconButton onClick={() => navigate(-1)} aria-label="back">
                 <Iconify icon="eva:arrow-ios-back-fill" width={22} />
               </IconButton>
             ) : null}

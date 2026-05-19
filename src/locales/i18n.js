@@ -10,6 +10,15 @@ export const allLangs = [
   { label: 'العربية', value: 'ar', icon: 'flagpack:ae', systemValue: 'ar' },
 ];
 
+const SUPPORTED = allLangs.map((l) => l.value);
+
+const applyHtmlAttrs = (lng) => {
+  if (typeof document === 'undefined') return;
+  const resolved = SUPPORTED.includes(lng) ? lng : 'en';
+  document.documentElement.lang = resolved;
+  document.documentElement.dir = resolved === 'ar' ? 'rtl' : 'ltr';
+};
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -18,11 +27,21 @@ i18n
       en: { translations: en },
       ar: { translations: ar },
     },
-    lng: localStorage.getItem('i18nextLng') || 'en',
     fallbackLng: 'en',
+    supportedLngs: SUPPORTED,
+    nonExplicitSupportedLngs: true,
+    load: 'languageOnly',
     ns: ['translations'],
     defaultNS: 'translations',
     interpolation: { escapeValue: false },
-  });
+    detection: {
+      order: ['localStorage', 'navigator', 'htmlTag'],
+      caches: ['localStorage'],
+      lookupLocalStorage: 'i18nextLng',
+    },
+  })
+  .then(() => applyHtmlAttrs(i18n.resolvedLanguage || i18n.language));
+
+i18n.on('languageChanged', (lng) => applyHtmlAttrs(lng));
 
 export default i18n;
