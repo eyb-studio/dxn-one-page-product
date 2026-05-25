@@ -1,5 +1,5 @@
 import { findOrderById } from '../_lib/airtable.js';
-import { CURRENCY } from '../_lib/pricing.js';
+import { CURRENCY, SIZES } from '../_lib/pricing.js';
 
 const ID_RE = /^DXN-[A-Z2-9]{6}$/;
 
@@ -33,6 +33,21 @@ export default async function handler(req, res) {
 
   const f = record.fields || {};
 
+  const small = Number(f.quantity_small || 0);
+  // Legacy orders only have `quantity` (Large). Backfill so the frontend
+  // can render line items consistently.
+  const large = Number(
+    f.quantity_large != null ? f.quantity_large : f.quantity || 0
+  );
+
+  const items = [];
+  if (large > 0) {
+    items.push({ size: 'large', quantity: large, unitPrice: SIZES.large.price });
+  }
+  if (small > 0) {
+    items.push({ size: 'small', quantity: small, unitPrice: SIZES.small.price });
+  }
+
   res.setHeader('Cache-Control', 'no-store');
   return res.status(200).json({
     orderId: f.order_id,
@@ -47,7 +62,8 @@ export default async function handler(req, res) {
       city: f.city || '',
       emirate: f.emirate || '',
     },
-    quantity: Number(f.quantity || 0),
+    items,
+    quantity: Number(f.quantity || small + large),
     subtotal: Number(f.subtotal || 0),
     shipping: Number(f.shipping || 0),
     total: Number(f.total || 0),

@@ -13,7 +13,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import Iconify from '../components/iconify';
-import { PRODUCT, SHIPPING } from '../data/product';
+import { PRODUCT, SIZES } from '../data/product';
 import { fCurrency } from '../utils/format-currency';
 import { useOrder } from '../contexts/order-context';
 import { useLocales } from '../locales/use-locales';
@@ -22,18 +22,18 @@ export default function ReviewPage() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { t, lang } = useLocales();
-  const { quantity, address } = useOrder();
+  const { items, totalItems, subtotal, shipping, total, address } = useOrder();
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!address) navigate('/location', { replace: true });
   }, [address, navigate]);
 
-  if (!address) return null;
+  useEffect(() => {
+    if (totalItems === 0) navigate('/cart', { replace: true });
+  }, [totalItems, navigate]);
 
-  const subtotal = PRODUCT.price * quantity;
-  const shipping = quantity >= SHIPPING.freeAfterQty ? 0 : SHIPPING.fee;
-  const total = subtotal + shipping;
+  if (!address || totalItems === 0) return null;
 
   const onPlaceOrder = async () => {
     if (submitting) return;
@@ -52,7 +52,7 @@ export default function ReviewPage() {
           emirate: address.emirate,
           notes: address.notes,
           coords: address.coords,
-          quantity,
+          items,
           language: lang,
         }),
       });
@@ -99,7 +99,7 @@ export default function ReviewPage() {
                 <Typography variant="subtitle1">{t('review.items')}</Typography>
                 <Button
                   component={Link}
-                  to="/"
+                  to="/cart"
                   size="small"
                   startIcon={<Iconify icon="solar:pen-bold" width={14} />}
                 >
@@ -107,32 +107,39 @@ export default function ReviewPage() {
                 </Button>
               </Stack>
 
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Box
-                  component="img"
-                  src={PRODUCT.images[0]}
-                  alt={t('product.name')}
-                  sx={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: 1.5,
-                    objectFit: 'contain',
-                    bgcolor: 'background.neutral',
-                    p: 0.5,
-                  }}
-                />
-                <Stack sx={{ flexGrow: 1 }}>
-                  <Typography variant="subtitle2">{t('product.name')}</Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    {t('product.subtitle')}
-                  </Typography>
-                </Stack>
-                <Stack alignItems="flex-end">
-                  <Typography variant="subtitle2">×{quantity}</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    {fCurrency(PRODUCT.price * quantity, PRODUCT.currency)}
-                  </Typography>
-                </Stack>
+              <Stack spacing={2} divider={<Divider sx={{ borderStyle: 'dashed' }} />}>
+                {items.map((item) => {
+                  const size = SIZES[item.size];
+                  return (
+                    <Stack key={item.size} direction="row" spacing={2} alignItems="center">
+                      <Box
+                        component="img"
+                        src={size.images[0]}
+                        alt={t(`product.size_${item.size}_name`)}
+                        sx={{
+                          width: 72,
+                          height: 72,
+                          borderRadius: 1.5,
+                          objectFit: 'contain',
+                          bgcolor: 'background.neutral',
+                          p: 0.5,
+                        }}
+                      />
+                      <Stack sx={{ flexGrow: 1, minWidth: 0 }}>
+                        <Typography variant="subtitle2">{t('product.name')}</Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          {t(`product.size_${item.size}_name`)}
+                        </Typography>
+                      </Stack>
+                      <Stack alignItems="flex-end">
+                        <Typography variant="subtitle2">×{item.quantity}</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          {fCurrency(size.price * item.quantity, PRODUCT.currency)}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  );
+                })}
               </Stack>
             </Card>
 
@@ -202,9 +209,22 @@ export default function ReviewPage() {
             </Typography>
 
             <Stack spacing={1.5}>
+              {items.map((item) => (
+                <Stack key={item.size} direction="row" justifyContent="space-between">
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    {t(`product.size_${item.size}_short`)} × {item.quantity}
+                  </Typography>
+                  <Typography variant="body2">
+                    {fCurrency(SIZES[item.size].price * item.quantity, PRODUCT.currency)}
+                  </Typography>
+                </Stack>
+              ))}
+
+              <Divider sx={{ borderStyle: 'dashed', my: 0.5 }} />
+
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  {t('review.items')}
+                  {t('product.subtotal')}
                 </Typography>
                 <Typography variant="body2">{fCurrency(subtotal, PRODUCT.currency)}</Typography>
               </Stack>
@@ -220,12 +240,6 @@ export default function ReviewPage() {
                   <Typography variant="body2">{fCurrency(shipping, PRODUCT.currency)}</Typography>
                 )}
               </Stack>
-              {shipping > 0 ? (
-                <Stack direction="row" spacing={0.75} alignItems="center" sx={{ color: 'text.secondary' }}>
-                  <Iconify icon="solar:info-circle-bold" width={14} />
-                  <Typography variant="caption">{t('product.add_for_free_delivery')}</Typography>
-                </Stack>
-              ) : null}
             </Stack>
 
             <Divider sx={{ borderStyle: 'dashed', my: 2.5 }} />

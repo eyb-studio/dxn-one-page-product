@@ -14,6 +14,13 @@ export default function OrderSummaryCard({ order }) {
     .filter(Boolean)
     .join(' · ');
 
+  // The API returns either an `items` array (new orders) or just `quantity`
+  // (legacy single-size orders).
+  const items =
+    Array.isArray(order.items) && order.items.length
+      ? order.items
+      : [{ size: 'large', quantity: order.quantity, unitPrice: null }];
+
   return (
     <Card sx={{ p: { xs: 2.5, md: 3 }, textAlign: 'start' }}>
       <Stack spacing={2}>
@@ -38,14 +45,29 @@ export default function OrderSummaryCard({ order }) {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
+        <Stack spacing={1}>
+          {items.map((item) => (
+            <Stack key={item.size} direction="row" justifyContent="space-between">
+              <Box>
+                <Typography variant="subtitle2">{t('product.name')}</Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  {t(`product.size_${item.size}_name`)} · ×{item.quantity}
+                </Typography>
+              </Box>
+              {item.unitPrice != null ? (
+                <Typography variant="subtitle2">
+                  {fCurrency(item.unitPrice * item.quantity, order.currency)}
+                </Typography>
+              ) : null}
+            </Stack>
+          ))}
+        </Stack>
+
         <Stack direction="row" justifyContent="space-between">
-          <Box>
-            <Typography variant="subtitle2">{t('product.name')}</Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              ×{order.quantity}
-            </Typography>
-          </Box>
-          <Typography variant="subtitle2">{fCurrency(order.subtotal, order.currency)}</Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {t('product.subtotal')}
+          </Typography>
+          <Typography variant="body2">{fCurrency(order.subtotal, order.currency)}</Typography>
         </Stack>
 
         <Stack direction="row" justifyContent="space-between">

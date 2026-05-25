@@ -1,39 +1,60 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
+
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
+import Link from '@mui/material/Link';
 import Rating from '@mui/material/Rating';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 
 import Iconify from '../../components/iconify';
 import { fCurrency } from '../../utils/format-currency';
 import { useOrder } from '../../contexts/order-context';
 import { useLocales } from '../../locales/use-locales';
-import { SHIPPING } from '../../data/product';
+import { PRODUCT, SIZES } from '../../data/product';
 import { trackEvent } from '../../utils/meta-pixel';
 
-export default function ProductSummary({ product }) {
+export default function ProductSummary({ sizeKey }) {
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const { t } = useLocales();
-  const { quantity, setQuantity } = useOrder();
+  const theme = useTheme();
+  const isRtl = theme.direction === 'rtl';
+  const { items, addItem } = useOrder();
 
-  const total = product.price * quantity;
-  const inStock = product.available > 0;
-  const inc = () => setQuantity(Math.min(product.available, quantity + 1));
-  const dec = () => setQuantity(Math.max(1, quantity - 1));
+  const size = SIZES[sizeKey];
+  const otherKey = sizeKey === 'large' ? 'small' : 'large';
+  const inStock = size.available > 0;
+  const inCartLine = items.find((i) => i.size === sizeKey);
+  const inCartQty = inCartLine?.quantity ?? 0;
 
-  const handleBuy = () => {
-    trackEvent('InitiateCheckout', {
-      content_ids: [product.id],
+  const [quantity, setQuantity] = useState(1);
+  const inc = () => setQuantity((q) => Math.min(size.available, q + 1));
+  const dec = () => setQuantity((q) => Math.max(1, q - 1));
+
+  const handleAdd = () => {
+    addItem(sizeKey, quantity);
+    trackEvent('AddToCart', {
+      content_ids: [size.id],
       content_name: 'DXN Spirulina',
       content_type: 'product',
       num_items: quantity,
-      value: total,
-      currency: product.currency,
+      value: size.price * quantity,
+      currency: PRODUCT.currency,
     });
-    navigate('/location');
+    enqueueSnackbar(t('product.added_to_cart'), {
+      variant: 'success',
+      action: () => (
+        <Button color="inherit" size="small" onClick={() => navigate('/cart')}>
+          {t('product.go_to_cart')}
+        </Button>
+      ),
+    });
   };
 
   return (
@@ -69,46 +90,70 @@ export default function ProductSummary({ product }) {
         </Stack>
 
         <Typography variant="h1">{t('product.name')}</Typography>
+        <Typography variant="subtitle1" sx={{ color: 'text.primary' }}>
+          {t(`product.size_${sizeKey}_name`)}
+        </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {t('product.subtitle')}
+          {t(`product.size_${sizeKey}_subtitle`)}
         </Typography>
 
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Rating size="small" value={product.rating} precision={0.1} readOnly />
+          <Rating size="small" value={PRODUCT.rating} precision={0.1} readOnly />
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            ({product.reviews})
+            ({PRODUCT.reviews})
           </Typography>
         </Stack>
 
-        <Box sx={{ typography: 'h2' }}>{fCurrency(product.price, product.currency)}</Box>
+        <Stack direction="row" alignItems="baseline" spacing={1.5}>
+          <Typography variant="h2">{fCurrency(size.price, PRODUCT.currency)}</Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: size.shippingFee === 0 ? 'success.darker' : 'text.secondary',
+              fontWeight: size.shippingFee === 0 ? 700 : 500,
+            }}
+          >
+            {size.shippingFee === 0
+              ? t('product.free_delivery')
+              : t('product.delivery_fee', {
+                  fee: fCurrency(size.shippingFee, PRODUCT.currency),
+                })}
+          </Typography>
+        </Stack>
       </Stack>
 
       <Divider sx={{ borderStyle: 'dashed' }} />
 
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Typography variant="subtitle2">{t('product.qty')}</Typography>
-        <Stack direction="row" alignItems="center" spacing={0}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={0}
+          sx={{
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 1,
+          }}
+        >
           <IconButton size="small" onClick={dec} disabled={quantity <= 1}>
             <Iconify icon="eva:minus-fill" width={16} />
           </IconButton>
           <Typography variant="subtitle1" sx={{ minWidth: 32, textAlign: 'center' }}>
             {quantity}
           </Typography>
-          <IconButton size="small" onClick={inc} disabled={quantity >= product.available}>
+          <IconButton
+            size="small"
+            onClick={inc}
+            disabled={quantity >= size.available}
+          >
             <Iconify icon="eva:plus-fill" width={16} />
           </IconButton>
         </Stack>
       </Stack>
       <Typography variant="caption" sx={{ color: 'text.secondary', textAlign: 'end' }}>
-        {t('product.available', { count: product.available })}
+        {t('product.available', { count: size.available })}
       </Typography>
-
-      <Divider sx={{ borderStyle: 'dashed' }} />
-
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Typography variant="subtitle1">{t('product.subtotal')}</Typography>
-        <Typography variant="h3">{fCurrency(total, product.currency)}</Typography>
-      </Stack>
 
       <Button
         fullWidth
@@ -116,31 +161,86 @@ export default function ProductSummary({ product }) {
         color="primary"
         variant="contained"
         disabled={!inStock}
-        startIcon={<Iconify icon="solar:bag-check-bold" width={22} />}
-        onClick={handleBuy}
-        sx={{ boxShadow: (t) => t.customShadows.primary }}
+        startIcon={<Iconify icon="solar:cart-plus-bold" width={22} />}
+        onClick={handleAdd}
+        sx={{ boxShadow: (th) => th.customShadows.primary }}
       >
-        {t('product.buy_now')}
+        {t('product.add_to_cart')}
       </Button>
 
-      <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" sx={{ color: 'text.secondary' }}>
+      {inCartQty > 0 ? (
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{
+            p: 1.5,
+            borderRadius: 1.5,
+            bgcolor: 'success.lighter',
+            color: 'success.darker',
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Iconify icon="solar:cart-check-bold" width={18} />
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {t('product.in_cart')}: {inCartQty}
+            </Typography>
+          </Stack>
+          <Button
+            component={RouterLink}
+            to="/cart"
+            size="small"
+            color="inherit"
+            endIcon={
+              <Iconify
+                icon={isRtl ? 'eva:arrow-ios-back-fill' : 'eva:arrow-ios-forward-fill'}
+                width={16}
+              />
+            }
+          >
+            {t('product.go_to_cart')}
+          </Button>
+        </Stack>
+      ) : null}
+
+      <Stack spacing={0.5} alignItems="center">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          {t('product.switch_size_cta')}
+        </Typography>
+        <Link
+          component={RouterLink}
+          to={`/${otherKey}`}
+          underline="hover"
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.5,
+            fontWeight: 600,
+          }}
+        >
+          {t(`product.switch_to_${otherKey}`)}
+          <Iconify
+            icon={isRtl ? 'eva:arrow-ios-back-fill' : 'eva:arrow-ios-forward-fill'}
+            width={16}
+          />
+        </Link>
+      </Stack>
+
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        justifyContent="center"
+        sx={{ color: 'text.secondary' }}
+      >
         <Stack direction="row" spacing={0.75} alignItems="center">
           <Iconify icon="solar:shield-check-bold" width={18} />
           <Typography variant="caption">{t('product.secure_checkout')}</Typography>
         </Stack>
         <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'divider' }} />
         <Stack direction="row" spacing={0.75} alignItems="center">
-          <Iconify
-            icon="solar:delivery-bold"
-            width={18}
-            sx={{ color: quantity >= SHIPPING.freeAfterQty ? 'success.main' : 'inherit' }}
-          />
-          <Typography
-            variant="caption"
-            sx={{ color: quantity >= SHIPPING.freeAfterQty ? 'success.darker' : 'inherit', fontWeight: quantity >= SHIPPING.freeAfterQty ? 700 : 400 }}
-          >
-            {quantity >= SHIPPING.freeAfterQty ? t('product.free_shipping') : t('product.add_for_free_delivery')}
-          </Typography>
+          <Iconify icon="solar:wad-of-money-bold" width={18} />
+          <Typography variant="caption">{t('product.cta_cod_badge')}</Typography>
         </Stack>
       </Stack>
     </Stack>

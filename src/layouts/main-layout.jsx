@@ -10,6 +10,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 
+import CartIcon from '../components/cart-icon';
 import Iconify from '../components/iconify';
 import LanguagePopover from '../components/language-popover';
 import { trackPageView } from '../utils/meta-pixel';
@@ -104,6 +105,8 @@ export default function MainLayout({ children }) {
       <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
         {children}
       </Container>
+
+      <CartIcon />
     </Box>
   );
 }

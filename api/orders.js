@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import { createOrder } from './_lib/airtable.js';
 import { generateOrderId } from './_lib/order-id.js';
-import { quote, CURRENCY } from './_lib/pricing.js';
+import { quote, summarizeItems, CURRENCY } from './_lib/pricing.js';
 import { buildOrderEmail } from './_lib/email-template.js';
 
 const UAE_MOBILE_RE = /^0(50|52|54|55|56|58)\d{7}$/;
@@ -40,17 +40,34 @@ function validate(body) {
   const emirate = str('emirate', 80);
   const notes = (body?.notes ?? '').toString().slice(0, 500);
 
-  const quantity = Number.parseInt(body?.quantity, 10);
-  if (!Number.isFinite(quantity) || quantity < 1 || quantity > 20) {
-    errors.push('quantity must be between 1 and 20');
-  }
+  const priced = quote({
+    items: body?.items,
+    size: body?.size,
+    quantity: body?.quantity,
+  });
+  if (priced.items.length === 0) errors.push('cart is empty');
+  if (priced.quantity > 40) errors.push('cart exceeds maximum quantity');
 
   const language = body?.language === 'ar' ? 'ar' : 'en';
 
   const lat = Number(body?.coords?.lat);
   const lng = Number(body?.coords?.lng);
 
-  return { errors, name, phone, email, address_line, building, city, emirate, notes, quantity, language, lat, lng };
+  return {
+    errors,
+    name,
+    phone,
+    email,
+    address_line,
+    building,
+    city,
+    emirate,
+    notes,
+    priced,
+    language,
+    lat,
+    lng,
+  };
 }
 
 export default async function handler(req, res) {
@@ -63,9 +80,12 @@ export default async function handler(req, res) {
   const v = validate(body);
   if (v.errors.length) return res.status(400).json({ error: 'validation', details: v.errors });
 
-  const { subtotal, shipping, total, quantity } = quote(v.quantity);
+  const { items, subtotal, shipping, total, quantity } = v.priced;
   const orderId = generateOrderId();
   const appUrl = (process.env.APP_URL || `https://${req.headers.host}`).replace(/\/$/, '');
+
+  const small = items.find((i) => i.size === 'small')?.quantity || 0;
+  const large = items.find((i) => i.size === 'large')?.quantity || 0;
 
   try {
     await createOrder({
@@ -83,6 +103,9 @@ export default async function handler(req, res) {
       lat: Number.isFinite(v.lat) ? v.lat : undefined,
       lng: Number.isFinite(v.lng) ? v.lng : undefined,
       quantity,
+      quantity_small: small,
+      quantity_large: large,
+      items_summary: summarizeItems(items, v.language),
       subtotal,
       shipping,
       total,
@@ -109,6 +132,7 @@ export default async function handler(req, res) {
           building: v.building,
           city: v.city,
           emirate: v.emirate,
+          items,
           quantity,
           subtotal,
           shipping,

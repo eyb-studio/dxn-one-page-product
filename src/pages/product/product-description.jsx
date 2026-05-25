@@ -67,18 +67,22 @@ export default function ProductDescription() {
 function BlogContent({ blog }) {
   const navigate = useNavigate();
   const { t } = useLocales();
-  const { quantity } = useOrder();
+  const { items, totalItems, total } = useOrder();
 
   const handleCta = () => {
+    if (totalItems === 0) {
+      navigate('/');
+      return;
+    }
     trackEvent('InitiateCheckout', {
-      content_ids: [PRODUCT.id],
+      content_ids: items.map((i) => i.size),
       content_name: 'DXN Spirulina',
       content_type: 'product',
-      num_items: quantity,
-      value: PRODUCT.price * quantity,
+      num_items: totalItems,
+      value: total,
       currency: PRODUCT.currency,
     });
-    navigate('/location');
+    navigate('/cart');
   };
 
   return (

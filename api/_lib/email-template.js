@@ -1,6 +1,8 @@
 // Bilingual order-confirmation email. Inline styles only — most mail
 // clients strip <style> blocks. RTL applied to <body> when language === 'ar'.
 
+import { SIZES } from './pricing.js';
+
 const COPY = {
   en: {
     subject: (id) => `Your DXN Spirulina order is confirmed — ${id}`,
@@ -10,8 +12,9 @@ const COPY = {
       'Thanks for your order! We have received it and will WhatsApp or call you shortly on the number you provided to confirm the delivery time.',
     order_no: 'Order number',
     summary: 'Order summary',
-    product: 'DXN Spirulina · 250 mg · 500 tablets',
-    qty: 'Quantity',
+    product: 'DXN Spirulina · 250 mg',
+    size_label: { large: 'Large bottle · 500 tablets', small: 'Small bottle · 120 tablets' },
+    qty: 'Qty',
     subtotal: 'Subtotal',
     shipping: 'Shipping',
     shipping_free: 'FREE',
@@ -37,7 +40,8 @@ const COPY = {
       'شكرًا لطلبك! لقد استلمناه وسنتواصل معك قريبًا عبر واتساب أو هاتفيًا على الرقم الذي قدّمته لتأكيد وقت التوصيل.',
     order_no: 'رقم الطلب',
     summary: 'ملخص الطلب',
-    product: 'دي إكس إن سبيرولينا · 250 ملغم · 500 قرص',
+    product: 'دي إكس إن سبيرولينا · 250 ملغم',
+    size_label: { large: 'علبة كبيرة · 500 قرص', small: 'علبة صغيرة · 120 قرص' },
     qty: 'الكمية',
     subtotal: 'المجموع الفرعي',
     shipping: 'الشحن',
@@ -66,6 +70,36 @@ export function buildOrderEmail({ order, lang = 'en', appUrl }) {
   const addressLine = [order.address_line, order.building, order.city, order.emirate]
     .filter(Boolean)
     .join(' · ');
+
+  const oppositeAlign = t.align === 'left' ? 'right' : 'left';
+
+  // Normalise to an array of line items so the loop is uniform regardless
+  // of which payload shape we received from api/orders.js.
+  const items =
+    Array.isArray(order.items) && order.items.length
+      ? order.items
+      : [{ size: 'large', quantity: order.quantity || 0 }];
+
+  const itemRows = items
+    .map((item, idx) => {
+      const size = SIZES[item.size] ? item.size : 'large';
+      const lineTotal = item.quantity * SIZES[size].price;
+      const isLast = idx === items.length - 1;
+      const border = isLast ? '1px solid #EDEFF2' : '1px dashed #EDEFF2';
+      return `
+                  <tr>
+                    <td style="padding:12px 0;border-bottom:${border};font-size:14px;">
+                      <div style="font-weight:600;">${t.product}</div>
+                      <div style="color:#637381;font-size:13px;margin-top:2px;">${escapeHtml(
+                        t.size_label[size]
+                      )} · ${t.qty}: ${item.quantity}</div>
+                    </td>
+                    <td style="padding:12px 0;border-bottom:${border};font-size:14px;text-align:${oppositeAlign};vertical-align:top;">
+                      ${money(lineTotal, order.currency)}
+                    </td>
+                  </tr>`;
+    })
+    .join('');
 
   const html = `<!doctype html>
 <html lang="${lang}" dir="${t.dir}">
@@ -100,24 +134,20 @@ export function buildOrderEmail({ order, lang = 'en', appUrl }) {
 
                 <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#637381;margin:0 0 12px 0;">${t.summary}</h3>
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:24px;">
+                  ${itemRows}
                   <tr>
-                    <td style="padding:12px 0;border-bottom:1px solid #EDEFF2;font-size:14px;">
-                      <div style="font-weight:600;">${t.product}</div>
-                      <div style="color:#637381;font-size:13px;margin-top:2px;">${t.qty}: ${order.quantity}</div>
-                    </td>
-                    <td style="padding:12px 0;border-bottom:1px solid #EDEFF2;font-size:14px;text-align:${t.align === 'left' ? 'right' : 'left'};vertical-align:top;">
-                      ${money(order.subtotal, order.currency)}
-                    </td>
+                    <td style="padding:10px 0;font-size:14px;color:#637381;">${t.subtotal}</td>
+                    <td style="padding:10px 0;font-size:14px;text-align:${oppositeAlign};">${money(order.subtotal, order.currency)}</td>
                   </tr>
                   <tr>
                     <td style="padding:10px 0;font-size:14px;color:#637381;">${t.shipping}</td>
-                    <td style="padding:10px 0;font-size:14px;color:${order.shipping === 0 ? '#118D57' : '#637381'};font-weight:${order.shipping === 0 ? '700' : '400'};text-align:${t.align === 'left' ? 'right' : 'left'};">
+                    <td style="padding:10px 0;font-size:14px;color:${order.shipping === 0 ? '#118D57' : '#637381'};font-weight:${order.shipping === 0 ? '700' : '400'};text-align:${oppositeAlign};">
                       ${order.shipping === 0 ? t.shipping_free : money(order.shipping, order.currency)}
                     </td>
                   </tr>
                   <tr>
                     <td style="padding:14px 0 4px 0;border-top:2px solid #212B36;font-size:16px;font-weight:700;">${t.total}</td>
-                    <td style="padding:14px 0 4px 0;border-top:2px solid #212B36;font-size:18px;font-weight:700;text-align:${t.align === 'left' ? 'right' : 'left'};">
+                    <td style="padding:14px 0 4px 0;border-top:2px solid #212B36;font-size:18px;font-weight:700;text-align:${oppositeAlign};">
                       ${money(order.total, order.currency)}
                     </td>
                   </tr>
