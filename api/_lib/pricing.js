@@ -4,8 +4,8 @@
 export const CURRENCY = 'AED';
 
 export const SIZES = {
-  large: { price: 300, sku: 'DXN-SP-500-L', shippingFee: 0 },
-  small: { price: 100, sku: 'DXN-SP-SMALL', shippingFee: 20 },
+  large: { price: 299, sku: 'DXN-SP-500-L', shippingFee: 0 },
+  small: { price: 99, sku: 'DXN-SP-SMALL', shippingFee: 20 },
 };
 
 const MAX_QTY = 20;
