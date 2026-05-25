@@ -84,9 +84,6 @@ export default async function handler(req, res) {
   const orderId = generateOrderId();
   const appUrl = (process.env.APP_URL || `https://${req.headers.host}`).replace(/\/$/, '');
 
-  const small = items.find((i) => i.size === 'small')?.quantity || 0;
-  const large = items.find((i) => i.size === 'large')?.quantity || 0;
-
   try {
     await createOrder({
       order_id: orderId,
@@ -103,8 +100,6 @@ export default async function handler(req, res) {
       lat: Number.isFinite(v.lat) ? v.lat : undefined,
       lng: Number.isFinite(v.lng) ? v.lng : undefined,
       quantity,
-      quantity_small: small,
-      quantity_large: large,
       items_summary: summarizeItems(items, v.language),
       subtotal,
       shipping,
