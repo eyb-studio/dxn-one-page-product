@@ -101,6 +101,7 @@ export default async function handler(req, res) {
       lng: Number.isFinite(v.lng) ? v.lng : undefined,
       quantity,
       items_summary: summarizeItems(items, v.language),
+      items_json: JSON.stringify(items.map((i) => ({ size: i.size, quantity: i.quantity }))),
       subtotal,
       shipping,
       total,
