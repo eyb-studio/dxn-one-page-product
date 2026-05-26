@@ -31,6 +31,7 @@ export default function CartPage() {
     subtotal,
     shipping,
     total,
+    address,
   } = useOrder();
 
   const empty = items.length === 0;
@@ -50,7 +51,7 @@ export default function CartPage() {
       value: total,
       currency: PRODUCT.currency,
     });
-    navigate('/location');
+    navigate(address ? '/review' : '/location');
   };
 
   return (

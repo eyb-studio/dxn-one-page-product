@@ -43,7 +43,8 @@ export default function ThankYouPage() {
       currency: order.currency,
       order_id: order.orderId,
     });
-  }, [order, purchaseFired]);
+    reset();
+  }, [order, purchaseFired, reset]);
 
   if (!orderId) {
     navigate('/', { replace: true });

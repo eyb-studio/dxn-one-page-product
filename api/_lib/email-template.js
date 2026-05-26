@@ -67,7 +67,7 @@ const money = (v, currency) => `${currency} ${Number(v).toFixed(2)}`;
 export function buildOrderEmail({ order, lang = 'en', appUrl }) {
   const t = COPY[lang] || COPY.en;
   const trackUrl = `${appUrl}/track?order=${encodeURIComponent(order.orderId)}`;
-  const addressLine = [order.address_line, order.building, order.city, order.emirate]
+  const addressLine = [order.address_line, order.building, order.emirate]
     .filter(Boolean)
     .join(' · ');
 

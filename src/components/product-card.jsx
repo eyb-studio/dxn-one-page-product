@@ -38,6 +38,24 @@ export default function ProductCard({ size }) {
           insetInlineEnd: 12,
         }}
       >
+        {size.popular ? (
+          <Box
+            sx={{
+              px: 0.75,
+              py: 0.25,
+              borderRadius: 0.75,
+              typography: 'caption',
+              fontWeight: 700,
+              fontSize: 10,
+              letterSpacing: 0.5,
+              textTransform: 'uppercase',
+              bgcolor: 'warning.main',
+              color: 'warning.contrastText',
+            }}
+          >
+            {t('product.label_popular')}
+          </Box>
+        ) : null}
         <Box
           sx={{
             px: 0.75,
@@ -100,9 +118,18 @@ export default function ProductCard({ size }) {
         </Typography>
 
         <Stack direction="row" alignItems="baseline" justifyContent="space-between">
-          <Typography variant="h5" sx={{ color: 'text.primary' }}>
-            {fCurrency(size.price, PRODUCT.currency)}
-          </Typography>
+          <Stack spacing={0.25}>
+            <Typography variant="h5" sx={{ color: 'text.primary' }}>
+              {fCurrency(size.price, PRODUCT.currency)}
+            </Typography>
+            {size.perDay ? (
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                {t('product.per_day', {
+                  amount: fCurrency(size.perDay, PRODUCT.currency),
+                })}
+              </Typography>
+            ) : null}
+          </Stack>
           <Typography
             variant="caption"
             sx={{

@@ -65,11 +65,11 @@ const createSchema = (t) =>
     email: yup
       .string()
       .transform(stripBidi)
-      .required(t('location.email_required'))
+      .transform((v) => (v === '' ? undefined : v))
+      .notRequired()
       .email(t('location.email_invalid')),
     address: yup.string().required('Address is required'),
     building: yup.string().required('Building / Apartment is required'),
-    city: yup.string().required('City is required'),
     emirate: yup.string().required('Emirate is required'),
     notes: yup.string(),
   });
@@ -109,7 +109,6 @@ export default function LocationPage() {
       email: address?.email ?? '',
       address: address?.address ?? '',
       building: address?.building ?? '',
-      city: address?.city ?? 'Dubai',
       emirate: address?.emirate ?? 'Dubai',
       notes: address?.notes ?? '',
     },
@@ -138,18 +137,10 @@ export default function LocationPage() {
         const fallbackStreet = place.formatted_address?.split(',')[0] ?? '';
         const addressLine = street || fallbackStreet;
         const building = pickComponent(place.address_components, 'subpremise', 'premise');
-        const city = pickComponent(
-          place.address_components,
-          'locality',
-          'postal_town',
-          'sublocality',
-          'administrative_area_level_2'
-        );
         const emirate = pickComponent(place.address_components, 'administrative_area_level_1');
 
         if (addressLine) setValue('address', addressLine, { shouldValidate: true });
         if (building) setValue('building', building);
-        if (city) setValue('city', city, { shouldValidate: true });
         if (emirate) setValue('emirate', emirate, { shouldValidate: true });
       } catch (err) {
         const status = err?.code ?? err?.message ?? '';
@@ -361,10 +352,7 @@ export default function LocationPage() {
                 />
                 <RHFTextField name="address" label={t('location.address_line')} />
                 <RHFTextField name="building" label={t('location.building')} />
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                  <RHFTextField name="city" label={t('location.city')} />
-                  <RHFTextField name="emirate" label={t('location.emirate')} />
-                </Stack>
+                <RHFTextField name="emirate" label={t('location.emirate')} />
                 <RHFTextField name="notes" label={t('location.notes')} multiline rows={2} />
 
                 <Divider sx={{ borderStyle: 'dashed' }} />

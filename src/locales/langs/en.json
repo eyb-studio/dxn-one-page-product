@@ -6,8 +6,23 @@
   },
   "product": {
     "label_new": "NEW",
+    "label_popular": "Most popular",
     "label_in_stock": "In stock",
     "label_out_of_stock": "Out of stock",
+    "per_day": "≈ {{amount}} / day",
+    "trust_cod": "Cash on delivery",
+    "trust_delivery": "1–2 day UAE delivery",
+    "testimonials_title": "What our customers say",
+    "testimonials": [
+      {
+        "name": "Verified buyer · Jan 17, 2024",
+        "quote": "Excellent and really useful for your body — it makes up for what you're missing from vegetables."
+      },
+      {
+        "name": "Sabah M. · Nov 4, 2022",
+        "quote": "A nutritional supplement that boosts immunity and protects against illness."
+      }
+    ],
     "name": "DXN Spirulina",
     "subtitle": "250 mg tablets · nature's most complete superfood, in two sizes.",
     "short_description": "100% pure DXN Spirulina — a complete plant-based protein packed with iron, B-vitamins, beta-carotene and antioxidants. 500 tablets in every bottle.",
@@ -156,6 +171,7 @@
     "switch_to_large": "See the Large bottle (299 AED · free delivery)",
     "switch_to_small": "See the Small bottle (99 AED + 20 AED delivery)",
     "add_to_cart": "Add to cart",
+    "order_now": "Order now",
     "added_to_cart": "Added to cart",
     "go_to_cart": "View cart",
     "in_cart": "In cart"
@@ -167,7 +183,7 @@
     "empty_title": "Your cart is empty",
     "empty_body": "Add a bottle from the shop to get started.",
     "continue_shopping": "Continue shopping",
-    "checkout": "Checkout",
+    "checkout": "Order now",
     "remove": "Remove"
   },
   "location": {
@@ -184,9 +200,8 @@
     "phone_required": "Phone number is required",
     "phone_invalid": "Enter a valid UAE mobile number starting with 50, 52, 54, 55, 56 or 58",
     "fullname": "Full name",
-    "email": "Email address",
-    "email_helper": "We'll send your order confirmation here.",
-    "email_required": "Email is required",
+    "email": "Email (optional)",
+    "email_helper": "Add an email if you'd like a receipt — not required.",
     "email_invalid": "Enter a valid email address",
     "notes": "Delivery notes (optional)",
     "continue": "Continue to review"

@@ -31,12 +31,14 @@ function validate(body) {
   const name = str('name', 120);
   const phone = normalizePhone(body?.phone);
   if (!UAE_MOBILE_RE.test(phone)) errors.push('phone must be a UAE mobile number');
+
+  // Email is optional — only validate if provided so the user can skip it
+  // without blocking checkout.
   const email = (body?.email ?? '').toString().trim().toLowerCase();
-  if (!EMAIL_RE.test(email)) errors.push('email is invalid');
+  if (email && !EMAIL_RE.test(email)) errors.push('email is invalid');
 
   const address_line = str('address', 250);
   const building = str('building', 120);
-  const city = str('city', 80);
   const emirate = str('emirate', 80);
   const notes = (body?.notes ?? '').toString().slice(0, 500);
 
@@ -60,7 +62,6 @@ function validate(body) {
     email,
     address_line,
     building,
-    city,
     emirate,
     notes,
     priced,
@@ -90,11 +91,10 @@ export default async function handler(req, res) {
       status: 'pending',
       name: v.name,
       phone: v.phone,
-      email: v.email,
+      email: v.email || undefined,
       language: v.language,
       address_line: v.address_line,
       building: v.building,
-      city: v.city,
       emirate: v.emirate,
       notes: v.notes,
       lat: Number.isFinite(v.lat) ? v.lat : undefined,
@@ -114,9 +114,10 @@ export default async function handler(req, res) {
     });
   }
 
-  // Fire email best-effort — failure must not roll back a real order.
-  try {
-    if (process.env.RESEND_API_KEY && process.env.RESEND_FROM) {
+  // Fire receipt email best-effort — only when the customer provided one.
+  // A failure here must never roll back the actual order.
+  if (v.email && process.env.RESEND_API_KEY && process.env.RESEND_FROM) {
+    try {
       const resend = new Resend(process.env.RESEND_API_KEY);
       const { subject, html } = buildOrderEmail({
         order: {
@@ -126,7 +127,6 @@ export default async function handler(req, res) {
           email: v.email,
           address_line: v.address_line,
           building: v.building,
-          city: v.city,
           emirate: v.emirate,
           items,
           quantity,
@@ -144,9 +144,9 @@ export default async function handler(req, res) {
         subject,
         html,
       });
+    } catch (err) {
+      console.error('[orders] resend send failed:', err);
     }
-  } catch (err) {
-    console.error('[orders] resend send failed:', err);
   }
 
   return res.status(201).json({ orderId, status: 'pending' });

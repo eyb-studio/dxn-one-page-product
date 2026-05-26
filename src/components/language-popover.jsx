@@ -1,54 +1,30 @@
-import { useState } from 'react';
-import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemText from '@mui/material/ListItemText';
+import Button from '@mui/material/Button';
 
-import Iconify from './iconify';
 import { useLocales } from '../locales/use-locales';
 
 export default function LanguagePopover() {
-  const { allLangs, currentLang, onChangeLang } = useLocales();
-  const [anchorEl, setAnchorEl] = useState(null);
+  const { currentLang, onChangeLang } = useLocales();
 
-  const handleClose = () => setAnchorEl(null);
-  const handleSelect = (value) => {
-    onChangeLang(value);
-    handleClose();
-  };
+  const isAr = currentLang.value === 'ar';
+  const nextLang = isAr ? 'en' : 'ar';
+  const label = isAr ? 'EN' : 'العربية';
 
   return (
-    <>
-      <IconButton
-        onClick={(e) => setAnchorEl(e.currentTarget)}
-        sx={{
-          width: 40,
-          height: 40,
-          ...(anchorEl && { bgcolor: 'action.selected' }),
-        }}
-      >
-        <Iconify icon={currentLang.icon} width={26} sx={{ borderRadius: 0.5 }} />
-      </IconButton>
-
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        slotProps={{ paper: { sx: { width: 160 } } }}
-      >
-        {allLangs.map((lang) => (
-          <MenuItem
-            key={lang.value}
-            selected={lang.value === currentLang.value}
-            onClick={() => handleSelect(lang.value)}
-          >
-            <Iconify icon={lang.icon} width={22} sx={{ mr: 1.5, borderRadius: 0.5 }} />
-            <ListItemText primaryTypographyProps={{ typography: 'body2' }}>{lang.label}</ListItemText>
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
+    <Button
+      onClick={() => onChangeLang(nextLang)}
+      size="small"
+      color="inherit"
+      sx={{
+        minWidth: 64,
+        px: 1.25,
+        color: 'text.primary',
+        fontWeight: 700,
+        borderRadius: 1,
+        border: (th) => `1px solid ${th.palette.divider}`,
+      }}
+      aria-label={`Switch language to ${label}`}
+    >
+      {label}
+    </Button>
   );
 }

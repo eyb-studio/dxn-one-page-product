@@ -32,7 +32,11 @@ export default function ProductPage({ sizeKey }) {
         <title>DXN Spirulina · {sizeKey === 'large' ? 'Large bottle' : 'Small bottle'}</title>
       </Helmet>
 
-      <Grid container spacing={{ xs: 3, md: 5, lg: 8 }}>
+      <Grid
+        container
+        spacing={{ xs: 3, md: 5, lg: 8 }}
+        sx={{ pb: { xs: 11, md: 0 } }}
+      >
         <Grid item xs={12} md={6} lg={7}>
           <ProductCarousel
             key={sizeKey}

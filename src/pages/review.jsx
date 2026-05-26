@@ -48,7 +48,6 @@ export default function ReviewPage() {
           email: address.email,
           address: address.address,
           building: address.building,
-          city: address.city,
           emirate: address.emirate,
           notes: address.notes,
           coords: address.coords,
@@ -162,7 +161,7 @@ export default function ReviewPage() {
                   {address.phone}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  {[address.address, address.building, address.city, address.emirate].filter(Boolean).join(' · ')}
+                  {[address.address, address.building, address.emirate].filter(Boolean).join(' · ')}
                 </Typography>
                 {address.notes ? (
                   <Typography variant="caption" sx={{ color: 'text.secondary', mt: 1 }}>

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { SIZES, SIZE_ORDER } from '../data/product';
 
@@ -7,14 +7,45 @@ const OrderContext = createContext(null);
 // items: [{ size: 'large', quantity: 2 }, ...]
 const EMPTY_ITEMS = [];
 
+const STORAGE_KEY = 'dxn:order:v1';
+
 const clampQty = (size, qty) => {
   const max = SIZES[size]?.available ?? 20;
   return Math.max(0, Math.min(max, Number(qty) || 0));
 };
 
+const loadFromStorage = () => {
+  if (typeof window === 'undefined') return { items: EMPTY_ITEMS, address: null };
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { items: EMPTY_ITEMS, address: null };
+    const parsed = JSON.parse(raw);
+    const items = Array.isArray(parsed?.items)
+      ? parsed.items
+          .filter((i) => i && SIZES[i.size])
+          .map((i) => ({ size: i.size, quantity: clampQty(i.size, i.quantity) }))
+          .filter((i) => i.quantity > 0)
+      : EMPTY_ITEMS;
+    const address = parsed?.address && typeof parsed.address === 'object' ? parsed.address : null;
+    return { items, address };
+  } catch {
+    return { items: EMPTY_ITEMS, address: null };
+  }
+};
+
 export function OrderProvider({ children }) {
-  const [items, setItems] = useState(EMPTY_ITEMS);
-  const [address, setAddress] = useState(null);
+  const initial = useMemo(loadFromStorage, []);
+  const [items, setItems] = useState(initial.items);
+  const [address, setAddress] = useState(initial.address);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ items, address }));
+    } catch {
+      // quota / private mode — silently ignore
+    }
+  }, [items, address]);
 
   const addItem = useCallback((size, qty = 1) => {
     if (!SIZES[size]) return;

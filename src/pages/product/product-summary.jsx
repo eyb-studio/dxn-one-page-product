@@ -25,7 +25,7 @@ export default function ProductSummary({ sizeKey }) {
   const { t } = useLocales();
   const theme = useTheme();
   const isRtl = theme.direction === 'rtl';
-  const { items, addItem } = useOrder();
+  const { items, addItem, address } = useOrder();
 
   const size = SIZES[sizeKey];
   const otherKey = sizeKey === 'large' ? 'small' : 'large';
@@ -55,6 +55,28 @@ export default function ProductSummary({ sizeKey }) {
         </Button>
       ),
     });
+  };
+
+  const handleOrderNow = () => {
+    addItem(sizeKey, quantity);
+    trackEvent('AddToCart', {
+      content_ids: [size.id],
+      content_name: 'DXN Spirulina',
+      content_type: 'product',
+      num_items: quantity,
+      value: size.price * quantity,
+      currency: PRODUCT.currency,
+    });
+    trackEvent('InitiateCheckout', {
+      content_ids: [size.id],
+      contents: [{ id: size.id, quantity, item_price: size.price }],
+      content_name: 'DXN Spirulina',
+      content_type: 'product',
+      num_items: quantity,
+      value: size.price * quantity,
+      currency: PRODUCT.currency,
+    });
+    navigate(address ? '/review' : '/location');
   };
 
   return (
@@ -155,18 +177,31 @@ export default function ProductSummary({ sizeKey }) {
         {t('product.available', { count: size.available })}
       </Typography>
 
-      <Button
-        fullWidth
-        size="large"
-        color="primary"
-        variant="contained"
-        disabled={!inStock}
-        startIcon={<Iconify icon="solar:cart-plus-bold" width={22} />}
-        onClick={handleAdd}
-        sx={{ boxShadow: (th) => th.customShadows.primary }}
-      >
-        {t('product.add_to_cart')}
-      </Button>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+        <Button
+          fullWidth
+          size="large"
+          color="primary"
+          variant="contained"
+          disabled={!inStock}
+          startIcon={<Iconify icon="solar:bag-check-bold" width={22} />}
+          onClick={handleOrderNow}
+          sx={{ boxShadow: (th) => th.customShadows.primary }}
+        >
+          {t('product.order_now')}
+        </Button>
+        <Button
+          fullWidth
+          size="large"
+          color="primary"
+          variant="outlined"
+          disabled={!inStock}
+          startIcon={<Iconify icon="solar:cart-plus-bold" width={22} />}
+          onClick={handleAdd}
+        >
+          {t('product.add_to_cart')}
+        </Button>
+      </Stack>
 
       {inCartQty > 0 ? (
         <Stack
@@ -243,6 +278,49 @@ export default function ProductSummary({ sizeKey }) {
           <Typography variant="caption">{t('product.cta_cod_badge')}</Typography>
         </Stack>
       </Stack>
+
+      <Box
+        sx={{
+          display: { xs: 'flex', md: 'none' },
+          position: 'fixed',
+          insetInline: 0,
+          bottom: 0,
+          zIndex: 1100,
+          px: 2,
+          py: 1.25,
+          bgcolor: (th) => `rgba(255,255,255,${th.palette.mode === 'dark' ? 0.92 : 0.96})`,
+          backdropFilter: 'blur(8px)',
+          borderTop: (th) => `1px solid ${th.palette.divider}`,
+          alignItems: 'center',
+          gap: 1.5,
+          paddingBottom: 'calc(env(safe-area-inset-bottom) + 10px)',
+        }}
+      >
+        <Stack sx={{ flexShrink: 0 }}>
+          <Typography variant="subtitle1" sx={{ lineHeight: 1.1 }}>
+            {fCurrency(size.price, PRODUCT.currency)}
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            {size.shippingFee === 0
+              ? t('product.free_delivery')
+              : t('product.delivery_fee', {
+                  fee: fCurrency(size.shippingFee, PRODUCT.currency),
+                })}
+          </Typography>
+        </Stack>
+        <Button
+          fullWidth
+          size="large"
+          color="primary"
+          variant="contained"
+          disabled={!inStock}
+          onClick={handleOrderNow}
+          startIcon={<Iconify icon="solar:bag-check-bold" width={20} />}
+          sx={{ boxShadow: (th) => th.customShadows.primary, ml: 'auto' }}
+        >
+          {t('product.order_now')}
+        </Button>
+      </Box>
     </Stack>
   );
 }

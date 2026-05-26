@@ -10,6 +10,8 @@ export const SIZES = {
     available: 24,
     images: ['/dxn-1.jpeg', '/dxn-2.jpg', '/dxn-3.webp'],
     shippingFee: 0,
+    perDay: 3.3,
+    popular: true,
   },
   small: {
     key: 'small',
@@ -19,6 +21,8 @@ export const SIZES = {
     available: 24,
     images: ['/small-1.jpg', '/small-2.jpeg'],
     shippingFee: 20,
+    perDay: 4.1,
+    popular: false,
   },
 };
 
